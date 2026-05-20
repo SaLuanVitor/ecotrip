@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="icon" type="image/x-icon" href="assets\icons\icon.svg">
+  <link rel="icon" type="image/x-icon" href="assets\icons\icon.png">
 
   <!-- Leaflet / OpenStreetMap -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -151,9 +151,9 @@
             <div class="result-card-icon" aria-hidden="true">&#x1F4CD;</div>
             <div class="result-card-header">
               <span class="result-card-label">Distância</span>
-              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0">
+              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0" aria-describedby="tooltipDistance">
                 &#x24D8;
-                <span class="tooltip-text">Distância total estimada entre origem e destino.</span>
+                <span class="tooltip-text" id="tooltipDistance" role="tooltip">Distância total estimada entre origem e destino.</span>
               </button>
             </div>
             <div class="result-card-value" id="resultDistance">—</div>
@@ -162,9 +162,9 @@
             <div class="result-card-icon" aria-hidden="true">&#x2601;</div>
             <div class="result-card-header">
               <span class="result-card-label">Emissão de CO&#x2082;e</span>
-              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0">
+              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0" aria-describedby="tooltipCO2">
                 &#x24D8;
-                <span class="tooltip-text">Quantidade estimada de dióxido de carbono equivalente emitida na viagem.</span>
+                <span class="tooltip-text" id="tooltipCO2" role="tooltip">Quantidade estimada de dióxido de carbono equivalente emitida na viagem.</span>
               </button>
             </div>
             <div class="result-card-value highlight" id="resultCO2">—</div>
@@ -173,9 +173,9 @@
             <div class="result-card-icon" aria-hidden="true">&#x1F4B0;</div>
             <div class="result-card-header">
               <span class="result-card-label">Créditos de Carbono</span>
-              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0">
+              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0" aria-describedby="tooltipCredits">
                 &#x24D8;
-                <span class="tooltip-text">Quantidade aproximada de créditos necessários para compensar a emissão. 1 crédito corresponde a 1 tonelada de CO&#x2082;e.</span>
+                <span class="tooltip-text" id="tooltipCredits" role="tooltip">Quantidade aproximada de créditos necessários para compensar a emissão. 1 crédito corresponde a 1 tonelada de CO&#x2082;e.</span>
               </button>
             </div>
             <div class="result-card-value" id="resultCredits">—</div>
@@ -184,9 +184,9 @@
             <div class="result-card-icon" aria-hidden="true">&#x1F333;</div>
             <div class="result-card-header">
               <span class="result-card-label">Árvores necessárias</span>
-              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0">
+              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0" aria-describedby="tooltipTrees">
                 &#x24D8;
-                <span class="tooltip-text">Quantidade estimada de árvores necessárias para absorver o CO&#x2082; emitido em aproximadamente um ano.</span>
+                <span class="tooltip-text" id="tooltipTrees" role="tooltip">Quantidade estimada de árvores necessárias para absorver o CO&#x2082; emitido em aproximadamente um ano.</span>
               </button>
             </div>
             <div class="result-card-value" id="resultTrees">—</div>
@@ -195,9 +195,9 @@
             <div class="result-card-icon" aria-hidden="true">&#x1F4B5;</div>
             <div class="result-card-header">
               <span class="result-card-label">Custo estimado</span>
-              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0">
+              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0" aria-describedby="tooltipCost">
                 &#x24D8;
-                <span class="tooltip-text">Valor aproximado para compensar a emissão por meio de projetos ambientais.</span>
+                <span class="tooltip-text" id="tooltipCost" role="tooltip">Valor aproximado para compensar a emissão por meio de projetos ambientais.</span>
               </button>
             </div>
             <div class="result-card-value" id="resultCost">—</div>
@@ -235,7 +235,7 @@
       </section>
 
       <!-- Compensation Card -->
-      <section class="compensation-card" aria-label="Compensação de carbono">
+      <section class="compensation-card" aria-label="Compensação de carbono" >
         <h3>Compensar agora?</h3>
         <p>Neutralize sua viagem apoiando projetos de reflorestamento.</p>
       </section>

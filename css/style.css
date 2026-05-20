@@ -455,7 +455,7 @@ body {
   gap: 24px;
   padding: 24px;
   max-width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Recommendation banner */
@@ -562,6 +562,8 @@ body {
 }
 
 .result-card {
+  position: relative;
+  overflow: visible;
   background: var(--white);
   border-radius: var(--radius);
   padding: 20px;
@@ -895,22 +897,21 @@ body {
   opacity: 0;
   position: absolute;
   bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  right: 0;
+  z-index: 10000;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 10px 12px;
+  border-radius: 8px;
   background: var(--text);
   color: var(--white);
-  font-size: 12px;
-  font-weight: 400;
-  padding: 8px 12px;
-  border-radius: 6px;
-  white-space: normal;
-  width: 240px;
-  text-align: center;
+  font-size: 14px;
   line-height: 1.4;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  white-space: normal;
+  word-break: break-word;
   pointer-events: none;
-  z-index: 10;
   transition: opacity 0.2s, visibility 0.2s;
-  box-shadow: var(--shadow-md);
   text-transform: none;
   letter-spacing: normal;
 }
@@ -919,8 +920,9 @@ body {
   content: '';
   position: absolute;
   top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 10px;
+  left: auto;
+  transform: none;
   border: 6px solid transparent;
   border-top-color: var(--text);
 }
@@ -929,6 +931,21 @@ body {
 .info-btn:focus-visible .tooltip-text {
   visibility: visible;
   opacity: 1;
+}
+
+/* Leaflet containment */
+.leaflet-pane,
+.leaflet-control,
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 1 !important;
+}
+
+/* Results and comparison above map */
+.results-section.visible,
+.comparison-section.visible {
+  position: relative;
+  z-index: 10;
 }
 
 /* Mode help text */
@@ -970,6 +987,18 @@ body {
 .status-message.visible {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+div#recommendationBanner{
+  margin-bottom: 0.5em;
+}
+
+section#resultsSection{
+  margin-top: 0.5em;
+}
+
+section.compensation-card{
+  margin-top: 0.5em;
 }
 
 /* Responsive */
@@ -1046,15 +1075,14 @@ body {
   }
 
   .info-btn .tooltip-text {
-    width: 200px;
-    left: auto;
-    right: 0;
-    transform: none;
+    right: auto;
+    left: 0;
+    max-width: min(280px, calc(100vw - 32px));
   }
 
   .info-btn .tooltip-text::after {
-    left: auto;
-    right: 10px;
+    right: auto;
+    left: 10px;
     transform: none;
   }
 }
