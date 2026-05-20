@@ -49,8 +49,18 @@
       <!-- Origin / Destination -->
       <div class="sidebar-section">
         <label for="origin">Origem</label>
-        <div class="input-group">
-          <input type="text" id="origin" class="input-field" placeholder="Cidade, estado ou endereço" autocomplete="off" aria-required="true">
+        <div class="input-group" id="originGroup">
+          <input type="text" id="origin" class="input-field"
+            placeholder="Digite um endereço ou selecione no mapa"
+            autocomplete="off" aria-required="true"
+            role="combobox" aria-expanded="false" aria-autocomplete="list"
+            aria-describedby="originStatus" aria-controls="originDropdown">
+          <button type="button" class="input-clear-btn" data-field="origin"
+            aria-label="Limpar origem" tabindex="-1">&#x2715;</button>
+          <span class="input-status-icon" id="originStatus" role="status"
+            aria-live="polite"></span>
+          <ul class="autocomplete-dropdown" id="originDropdown"
+            role="listbox" aria-label="Sugestões de endereço para origem"></ul>
         </div>
 
         <button type="button" id="swapBtn" class="swap-btn" aria-label="Inverter origem e destino" title="Inverter">
@@ -62,8 +72,18 @@
         </button>
 
         <label for="destination">Destino</label>
-        <div class="input-group">
-          <input type="text" id="destination" class="input-field" placeholder="Cidade, estado ou endereço" autocomplete="off" aria-required="true">
+        <div class="input-group" id="destGroup">
+          <input type="text" id="destination" class="input-field"
+            placeholder="Digite um endereço ou selecione no mapa"
+            autocomplete="off" aria-required="true"
+            role="combobox" aria-expanded="false" aria-autocomplete="list"
+            aria-describedby="destStatus" aria-controls="destDropdown">
+          <button type="button" class="input-clear-btn" data-field="dest"
+            aria-label="Limpar destino" tabindex="-1">&#x2715;</button>
+          <span class="input-status-icon" id="destStatus" role="status"
+            aria-live="polite"></span>
+          <ul class="autocomplete-dropdown" id="destDropdown"
+            role="listbox" aria-label="Sugestões de endereço para destino"></ul>
         </div>
       </div>
 

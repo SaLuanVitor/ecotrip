@@ -8,6 +8,8 @@
   var geocodeCache = {};
 
   var dblClickHandler = null;
+  var originMarker = null;
+  var destMarker = null;
 
   var osrmProfiles = {
     walking: 'foot',
@@ -43,6 +45,36 @@
 
     clearGeocodeCache: function () {
       geocodeCache = {};
+    },
+
+    geocodeSuggestions: function (address) {
+      var utils = window.EcoTrip.utils;
+      var config = window.EcoTrip.config;
+      var url =
+        'https://nominatim.openstreetmap.org/search' +
+        '?format=jsonv2' +
+        '&q=' + encodeURIComponent(address) +
+        '&limit=5' +
+        '&addressdetails=1' +
+        '&email=' + encodeURIComponent(config.CONTACT_EMAIL);
+
+      return utils.retryFetch(url, {
+        headers: {
+          Accept: 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      }, 2, config.REQUEST_TIMEOUT_MS)
+        .then(function (data) {
+          if (!data || data.length === 0) return [];
+          return data.map(function (item) {
+            return {
+              lat: parseFloat(item.lat),
+              lng: parseFloat(item.lon),
+              displayName: item.display_name,
+              address: item.address || {}
+            };
+          });
+        });
     },
 
     geocodeAddress: function (address) {
@@ -197,12 +229,48 @@
       routeLayer.addLayer(routePolyline);
     },
 
+    addMarker: function (which, coords) {
+      if (!markerLayer || !coords) return;
+      var isOrigin = which === 'origin';
+      var marker = L.circleMarker([coords.lat, coords.lng], {
+        color: isOrigin ? '#16A34A' : '#DC2626',
+        fillColor: isOrigin ? '#16A34A' : '#DC2626',
+        fillOpacity: 1,
+        radius: 8,
+        weight: 2,
+        className: isOrigin ? 'marker-origin' : 'marker-dest'
+      });
+      marker.bindTooltip(isOrigin ? 'Origem' : 'Destino', { direction: 'top' });
+      if (isOrigin) {
+        if (originMarker) markerLayer.removeLayer(originMarker);
+        originMarker = marker;
+      } else {
+        if (destMarker) markerLayer.removeLayer(destMarker);
+        destMarker = marker;
+      }
+      markerLayer.addLayer(marker);
+    },
+
+    removeMarker: function (which) {
+      if (!markerLayer) return;
+      if (which === 'origin' && originMarker) {
+        markerLayer.removeLayer(originMarker);
+        originMarker = null;
+      }
+      if (which === 'dest' && destMarker) {
+        markerLayer.removeLayer(destMarker);
+        destMarker = null;
+      }
+    },
+
     addMarkers: function (origin, dest) {
       if (!markerLayer) return;
       markerLayer.clearLayers();
+      originMarker = null;
+      destMarker = null;
 
       if (origin) {
-        var origMarker = L.circleMarker([origin.lat, origin.lng], {
+        originMarker = L.circleMarker([origin.lat, origin.lng], {
           color: '#16A34A',
           fillColor: '#16A34A',
           fillOpacity: 1,
@@ -210,12 +278,12 @@
           weight: 2,
           className: 'marker-origin'
         });
-        origMarker.bindTooltip('Origem', { direction: 'top' });
-        markerLayer.addLayer(origMarker);
+        originMarker.bindTooltip('Origem', { direction: 'top' });
+        markerLayer.addLayer(originMarker);
       }
 
       if (dest) {
-        var destMarker = L.circleMarker([dest.lat, dest.lng], {
+        destMarker = L.circleMarker([dest.lat, dest.lng], {
           color: '#DC2626',
           fillColor: '#DC2626',
           fillOpacity: 1,
@@ -266,6 +334,8 @@
       if (routeLayer) routeLayer.clearLayers();
       if (markerLayer) markerLayer.clearLayers();
       routePolyline = null;
+      originMarker = null;
+      destMarker = null;
     }
   };
 

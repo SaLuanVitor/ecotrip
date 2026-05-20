@@ -122,7 +122,7 @@ body {
 
 .input-field {
   width: 100%;
-  padding: 10px 14px;
+  padding: 10px 68px 10px 14px;
   border: 1.5px solid var(--gray-200);
   border-radius: var(--radius-sm);
   font-size: 14px;
@@ -144,6 +144,160 @@ body {
 
 .input-field::placeholder {
   color: var(--gray-400);
+}
+
+/* Validation states */
+.input-group.valid .input-field {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.input-group.pending .input-field {
+  border-color: var(--warning);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.input-group.invalid .input-field {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+/* Input clear button */
+.input-clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: var(--gray-200);
+  color: var(--gray-500);
+  cursor: pointer;
+  font-size: 11px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  padding: 0;
+  line-height: 1;
+  transition: background 0.2s, color 0.2s;
+}
+
+.input-group.has-value .input-clear-btn {
+  display: flex;
+}
+
+.input-clear-btn:hover {
+  background: var(--gray-300);
+  color: var(--text);
+}
+
+.input-clear-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Input status icon */
+.input-status-icon {
+  position: absolute;
+  right: 36px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.input-group.valid .input-status-icon,
+.input-group.pending .input-status-icon,
+.input-group.invalid .input-status-icon {
+  display: flex;
+}
+
+.input-group.valid .input-status-icon {
+  color: var(--primary);
+}
+
+.input-group.pending .input-status-icon {
+  color: var(--warning);
+}
+
+.input-group.invalid .input-status-icon {
+  color: var(--danger);
+}
+
+/* Autocomplete dropdown */
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-top: none;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  z-index: 50;
+  display: none;
+  max-height: 220px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.autocomplete-dropdown.open {
+  display: block;
+}
+
+.autocomplete-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  border-bottom: 1px solid var(--gray-100);
+  transition: background 0.1s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.active {
+  background: var(--primary-light);
+}
+
+.autocomplete-item .highlight {
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.autocomplete-empty {
+  padding: 10px 14px;
+  color: var(--gray-400);
+  font-size: 13px;
+  text-align: center;
+  cursor: default;
+}
+
+.autocomplete-loading {
+  padding: 10px 14px;
+  text-align: center;
+  color: var(--gray-400);
+  font-size: 13px;
+  cursor: default;
 }
 
 .input-spacer {
@@ -836,6 +990,15 @@ body {
 }
 
 @media (max-width: 768px) {
+  .input-clear-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .input-field {
+    padding: 10px 72px 10px 14px;
+  }
   .app-layout {
     flex-direction: column;
   }
@@ -919,5 +1082,15 @@ body {
 
   .result-card-value {
     font-size: 18px;
+  }
+
+  .input-clear-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .autocomplete-item {
+    padding: 12px 14px;
+    font-size: 14px;
   }
 }
