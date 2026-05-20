@@ -75,25 +75,33 @@ Please respect each service's usage policy:
 - **OSRM**: rate-limited, no SLA
 - **OpenStreetMap tiles**: usage subject to tile usage policy
 
-## GitHub Pages Deployment
+## Deploy no GitHub Pages
 
 1. Push the repository to GitHub:
 
    ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git remote add origin https://github.com/SaLuanVitor/ecotrip.git
-   git push -u origin main
+   git clone https://github.com/SaLuanVitor/ecotrip.git
    ```
 
-2. Go to repository **Settings** > **Pages**
+2. Push the code to the main branch:
 
-3. Under **Branch**, select `main` and `/ (root)` folder
+   ```bash
+   git add .
+   git commit -m "Initial commit"
+   git push origin main
+   ```
 
-4. Click **Save**
+3. Open the repository Settings:
+   https://github.com/SaLuanVitor/ecotrip/settings/pages
 
-5. Your site will be published at `https://anomalyco.github.io/ecotrip/`
+4. In the Pages section, set Source to: **GitHub Actions**
+
+5. Save the configuration.
+
+6. Every push to the main branch will automatically deploy the site.
+
+7. The application will be available at:
+   https://SaLuanVitor.github.io/ecotrip/
 
 ## Project Structure
 
