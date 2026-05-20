@@ -17,8 +17,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- html2pdf.js for PDF export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- jsPDF for PDF report generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Application Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
@@ -134,7 +135,7 @@
     <!-- Main Content -->
     <main class="main-content" role="main">
 
-      <div id="results-dashboard">
+      <div id="pdf-export-container">
       <!-- Recommendation Banner -->
       <div class="recommendation-banner" id="recommendationBanner" role="alert" aria-live="polite"></div>
 

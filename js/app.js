@@ -690,6 +690,7 @@
     }
     state.results = null;
     state.distances = null;
+    window.EcoTripMap.clearRoute();
   }
 
   function updateMap() {
@@ -856,48 +857,298 @@
 
   // --- PDF Export ---
 
-  function exportToPDF() {
-    var btn = document.getElementById('exportBtn');
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = 'Gerando PDF...';
-    }
+  function drawSectionBar(doc, y, text, MARGIN, CONTENT_WIDTH) {
+    doc.setFillColor(22, 163, 74);
+    doc.rect(MARGIN, y - 5, CONTENT_WIDTH, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.text(text, MARGIN + 4, y + 0.5);
+    doc.setFont(undefined, 'normal');
+  }
 
-    var element = document.getElementById('results-dashboard');
-    if (!element) {
-      if (btn) { btn.disabled = false; btn.textContent = '\uD83D\uDCC4 Exportar PDF'; }
+  function exportToPDF() {
+    if (!state.results || !state.distances) {
+      window.EcoTrip.utils.showError('Realize um c\u00E1lculo antes de exportar o relat\u00F3rio.');
       return;
     }
 
-    var hidden = [];
-    var exportWrapper = document.querySelector('.export-wrapper');
-    var compensationBtn = document.querySelector('.compensation-card .btn-primary');
+    var btn = document.getElementById('exportBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Gerando relat\u00F3rio...'; }
 
-    if (exportWrapper) { exportWrapper.style.display = 'none'; hidden.push(exportWrapper); }
-    if (compensationBtn) { compensationBtn.style.display = 'none'; hidden.push(compensationBtn); }
+    try {
+      var doc = new window.jspdf.jsPDF({
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait'
+      });
 
-    function restoreUI() {
-      for (var i = 0; i < hidden.length; i++) {
-        hidden[i].style.display = '';
+      var PW = 210;
+      var M = 20;
+      var CW = PW - 2 * M;
+      var COL1 = 50;
+
+      var GREEN = [22, 163, 74];
+      var DARK = [17, 24, 39];
+      var MEDIUM = [107, 114, 128];
+      var LIGHT_GRAY = [249, 250, 251];
+      var GREEN_BG = [220, 251, 231];
+      var YELLOW_BG = [254, 243, 199];
+      var RED_BG = [254, 226, 226];
+      var BORDER = [209, 213, 219];
+
+      var utils = window.EcoTrip.utils;
+      var config = window.EcoTrip.config;
+      var emissions = window.EcoTrip.emissions;
+      var comparison = window.EcoTrip.comparison;
+
+      var origin = state.validatedOrigin;
+      var dest = state.validatedDest;
+      var modeId = state.selectedMode;
+      var results = state.results;
+      var distances = state.distances;
+
+      var modeLabel = '';
+      for (var i = 0; i < config.transportModes.length; i++) {
+        if (config.transportModes[i].id === modeId) {
+          modeLabel = config.transportModes[i].label;
+          break;
+        }
       }
+
+      var now = new Date();
+      var dateStr = now.toLocaleDateString('pt-BR') + ' ' +
+        now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      var datePart = now.toISOString().split('T')[0];
+
+      var y = M;
+
+      // === COVER HEADER ===
+      doc.setTextColor.apply(doc, GREEN);
+      doc.setFontSize(24);
+      doc.setFont(undefined, 'bold');
+      doc.text('EcoTrip', M, y);
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor.apply(doc, MEDIUM);
+      doc.text(dateStr, PW - M, y, { align: 'right' });
+      y += 8;
+      doc.setTextColor.apply(doc, MEDIUM);
+      doc.setFontSize(14);
+      doc.text('Relat\u00F3rio de Impacto Ambiental', M, y);
+      y += 5;
+      doc.setDrawColor.apply(doc, GREEN);
+      doc.setLineWidth(0.5);
+      doc.line(M, y, PW - M, y);
+      y += 8;
+
+      // === SUMMARY HIGHLIGHT BOX ===
+      var metrics = [
+        { label: 'Dist\u00E2ncia', value: utils.formatNumber(results.distance, 1) + ' km' },
+        { label: 'CO2e', value: utils.formatNumber(results.co2, 1) + ' kg' },
+        { label: 'Cr\u00E9ditos', value: String(results.credits) },
+        { label: 'Custo', value: utils.formatCurrency(results.cost) },
+        { label: '\u00C1rvores', value: String(results.trees) }
+      ];
+
+      var boxW = CW;
+      var boxH = 26;
+      var boxX = M;
+      doc.setFillColor.apply(doc, GREEN_BG);
+      doc.rect(boxX, y, boxW, boxH, 'F');
+      var colW = boxW / metrics.length;
+      for (var i = 0; i < metrics.length; i++) {
+        var cx = boxX + colW * i + colW / 2;
+        doc.setFontSize(8);
+        doc.setTextColor.apply(doc, MEDIUM);
+        doc.text(metrics[i].label, cx, y + 8, { align: 'center' });
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor.apply(doc, GREEN);
+        doc.text(metrics[i].value, cx, y + 20, { align: 'center' });
+        doc.setFont(undefined, 'normal');
+      }
+      y += boxH + 12;
+
+      // === SECTION 1: Informações da Viagem ===
+      drawSectionBar(doc, y, '1. Informa\u00E7\u00F5es da Viagem', M, CW);
+      y += 14;
+      doc.setFontSize(10);
+
+      var infoItems = [
+        { label: 'Origem', value: origin && origin.address ? origin.address : '-' },
+        { label: 'Destino', value: dest && dest.address ? dest.address : '-' },
+        { label: 'Transporte', value: modeLabel },
+        { label: 'Dist\u00E2ncia', value: utils.formatNumber(results.distance, 1) + ' km' },
+        { label: 'Gerado em', value: dateStr }
+      ];
+      for (var i = 0; i < infoItems.length; i++) {
+        doc.setTextColor.apply(doc, MEDIUM);
+        doc.setFontSize(9);
+        doc.text(infoItems[i].label + ':', M + 4, y);
+        doc.setTextColor.apply(doc, DARK);
+        doc.setFontSize(10);
+        var val = infoItems[i].value;
+        var maxW = CW - COL1 - 8;
+        if (doc.getTextWidth(val) > maxW) {
+          var lines = doc.splitTextToSize(val, maxW);
+          doc.text(lines, M + COL1, y);
+          y += (lines.length - 1) * 5;
+        } else {
+          doc.text(val, M + COL1, y);
+        }
+        y += 7;
+      }
+      y += 4;
+
+      // === SECTION 2: Resultados Ambientais ===
+      drawSectionBar(doc, y, '2. Resultados Ambientais', M, CW);
+      y += 14;
+      doc.setFontSize(10);
+
+      var envItems = [
+        { label: 'Emiss\u00E3o de CO2e', value: utils.formatNumber(results.co2, 1) + ' kg', bold: true },
+        { label: 'Cr\u00E9ditos de carbono', value: String(results.credits), bold: false },
+        { label: '\u00C1rvores necess\u00E1rias', value: String(results.trees), bold: false },
+        { label: 'Custo de compensa\u00E7\u00E3o', value: utils.formatCurrency(results.cost), bold: true }
+      ];
+      for (var i = 0; i < envItems.length; i++) {
+        doc.setTextColor.apply(doc, MEDIUM);
+        doc.setFontSize(9);
+        doc.text(envItems[i].label + ':', M + 4, y);
+        doc.setTextColor.apply(doc, DARK);
+        if (envItems[i].bold) doc.setFont(undefined, 'bold');
+        doc.setFontSize(10);
+        doc.text(envItems[i].value, M + COL1, y);
+        doc.setFont(undefined, 'normal');
+        y += 7;
+      }
+      y += 4;
+
+      // === SECTION 3: Recomendação Inteligente ===
+      drawSectionBar(doc, y, '3. Recomenda\u00E7\u00E3o Inteligente', M, CW);
+      y += 14;
+      doc.setFontSize(10);
+
+      var comparisonData = comparison.generateComparison(distances);
+      var recommendation = comparison.getBestAlternative(comparisonData, modeId);
+      var recText = recommendation
+        ? recommendation.title + '. ' + recommendation.message
+        : 'Nenhuma recomenda\u00E7\u00E3o dispon\u00EDvel.';
+      var recLines = doc.splitTextToSize(recText, CW - 16);
+      var recH = recLines.length * 5 + 8;
+
+      // Determine efficiency for box color
+      var recColor = GREEN_BG;
+      for (var i = 0; i < comparisonData.length; i++) {
+        if (comparisonData[i].mode.id === modeId) {
+          var effClass = comparisonData[i].efficiency.class;
+          if (effClass === 'excelente' || effClass === 'muito-boa') {
+            recColor = GREEN_BG;
+          } else if (effClass === 'boa' || effClass === 'media') {
+            recColor = YELLOW_BG;
+          } else {
+            recColor = RED_BG;
+          }
+          break;
+        }
+      }
+
+      doc.setFillColor.apply(doc, recColor);
+      doc.rect(M, y - 2, CW, recH, 'F');
+      doc.setTextColor.apply(doc, DARK);
+      doc.text(recLines, M + 8, y + 4);
+      y += recH + 8;
+
+      // === SECTION 4: Comparação entre Modais ===
+      drawSectionBar(doc, y, '4. Compara\u00E7\u00E3o entre Modais', M, CW);
+      y += 12;
+
+      var allData = emissions.calculateAll(distances);
+      var tableBody = [];
+      for (var i = 0; i < config.transportModes.length; i++) {
+        var mode = config.transportModes[i];
+        var entry = allData[mode.id];
+        if (!entry) continue;
+        var eff = comparison.getEfficiencyLabel(entry.co2);
+        tableBody.push([
+          mode.label,
+          utils.formatNumber(entry.distance, 1),
+          utils.formatNumber(entry.co2, 1),
+          eff.label
+        ]);
+      }
+
+      doc.autoTable({
+        startY: y,
+        head: [['Modal', 'Dist\u00E2ncia (km)', 'CO2 (kg)', 'Efici\u00EAncia']],
+        body: tableBody,
+        headStyles: {
+          fillColor: GREEN,
+          fontSize: 9,
+          textColor: [255, 255, 255],
+          fontStyle: 'bold'
+        },
+        bodyStyles: { fontSize: 9, textColor: DARK },
+        alternateRowStyles: { fillColor: [240, 240, 240] },
+        margin: { left: M, right: M },
+        tableLineColor: BORDER,
+        tableLineWidth: 0.1,
+        tableWidth: CW,
+        columnStyles: {
+          0: { cellWidth: 40 },
+          1: { cellWidth: 50, halign: 'right' },
+          2: { cellWidth: 40, halign: 'right' },
+          3: { cellWidth: 40, halign: 'center' }
+        }
+      });
+
+      y = doc.lastAutoTable.finalY + 12;
+
+      // === SECTION 5: Observações Finais ===
+      if (y > 245) {
+        doc.addPage();
+        y = M;
+      }
+      drawSectionBar(doc, y, '5. Observa\u00E7\u00F5es Finais', M, CW);
+      y += 14;
+      doc.setFontSize(9);
+
+      var notes = [
+        '1 cr\u00E9dito de carbono equivale \u00E0 compensa\u00E7\u00E3o de 1 tonelada de CO2e.',
+        'Valores apresentados s\u00E3o estimativas baseadas em fatores m\u00E9dios de emiss\u00E3o.',
+        'Custos de compensa\u00E7\u00E3o s\u00E3o aproximados e podem variar conforme o mercado.',
+        'Emiss\u00F5es calculadas com base na dist\u00E2ncia percorrida e fatores espec\u00EDficos de cada modal.',
+        'Os resultados possuem car\u00E1ter educativo e n\u00E3o substituem auditorias profissionais.'
+      ];
+
+      var noteH = notes.length * 6 + 8;
+      doc.setDrawColor.apply(doc, BORDER);
+      doc.setFillColor.apply(doc, LIGHT_GRAY);
+      doc.rect(M, y - 4, CW, noteH, 'FD');
+      doc.setTextColor.apply(doc, DARK);
+      for (var i = 0; i < notes.length; i++) {
+        doc.text('\u2022 ' + notes[i], M + 8, y + i * 6 + 2);
+      }
+      y += noteH + 6;
+
+      // === FOOTER ===
+      var pageCount = doc.internal.getNumberOfPages();
+      for (var i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor.apply(doc, MEDIUM);
+        doc.text('Gerado automaticamente pelo EcoTrip', M, 292);
+        doc.text('P\u00E1gina ' + i + ' de ' + pageCount, PW - M - 30, 292);
+      }
+
+      doc.save('ecotrip-relatorio-' + datePart + '.pdf');
+    } catch (err) {
+      window.EcoTrip.utils.showError('N\u00E3o foi poss\u00EDvel gerar o relat\u00F3rio em PDF.');
+      console.error(err);
+    } finally {
       if (btn) { btn.disabled = false; btn.textContent = '\uD83D\uDCC4 Exportar PDF'; }
     }
-
-    var opt = {
-      margin: 10,
-      filename: 'ecotrip-impact-report.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(element).save()
-      .then(restoreUI)
-      .catch(function (err) {
-        restoreUI();
-        window.EcoTrip.utils.showError('Erro ao gerar PDF.');
-        console.error(err);
-      });
   }
 
   if (document.readyState === 'loading') {

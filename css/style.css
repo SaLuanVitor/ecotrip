@@ -846,9 +846,12 @@ body {
   transform: none;
 }
 
-/* Results dashboard wrapper */
-.results-dashboard {
-  display: contents;
+/* PDF export container */
+#pdf-export-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
 }
 
 /* Result card header */

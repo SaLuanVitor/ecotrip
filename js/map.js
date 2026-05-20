@@ -296,6 +296,11 @@
       }
     },
 
+    clearRoute: function () {
+      if (routeLayer) routeLayer.clearLayers();
+      routePolyline = null;
+    },
+
     fitToExtent: function (origin, dest) {
       if (!mapInstance || !origin || !dest) return;
       var bounds = L.latLngBounds(

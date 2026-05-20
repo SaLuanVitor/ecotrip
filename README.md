@@ -17,7 +17,7 @@ EcoTrip calculates the carbon footprint of a trip between two locations and sugg
 - Carbon credits and offset cost estimation
 - Trees required calculation
 - Recommendation engine for sustainable choices
-- PDF export via html2pdf.js
+- PDF report generation with travel details, environmental indicators, and modal comparison
 - Result card tooltips with contextual information
 - Transport mode help text with contextual descriptions
 - Responsive design (desktop, tablet, mobile)
@@ -43,7 +43,7 @@ EcoTrip calculates the carbon footprint of a trip between two locations and sugg
 - [OpenStreetMap](https://www.openstreetmap.org/) — map tiles
 - [Nominatim](https://nominatim.org/) — geocoding
 - [OSRM](https://project-osrm.org/) — route calculation
-- [html2pdf.js](https://ekoopmans.github.io/html2pdf.js/) — PDF export
+- [jsPDF](https://github.com/parallax/jsPDF) — PDF report generation
 
 ## Setup
 
