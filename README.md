@@ -45,7 +45,7 @@ EcoTrip calculates the carbon footprint of a trip between two locations and sugg
 No API keys required. Works immediately after cloning.
 
 ```bash
-git clone https://github.com/anomalyco/ecotrip.git
+git clone https://github.com/SaLuanVitor/ecotrip.git
 cd ecotrip
 ```
 
@@ -83,7 +83,7 @@ Please respect each service's usage policy:
    git init
    git add .
    git commit -m "Initial commit"
-   git remote add origin https://github.com/anomalyco/ecotrip.git
+   git remote add origin https://github.com/SaLuanVitor/ecotrip.git
    git push -u origin main
    ```
 
