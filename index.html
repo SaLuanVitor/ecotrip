@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="EcoTrip - Calculadora de impacto ambiental de viagens. Estime a pegada de carbono entre dois locais e descubra alternativas sustentáveis.">
+  <title>EcoTrip - Impacto Ambiental de Viagens</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet / OpenStreetMap -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- html2pdf.js for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay" role="alert" aria-live="assertive">
+    <div class="spinner" aria-hidden="true"></div>
+    <span class="sr-only">Processando sua solicitação...</span>
+  </div>
+
+  <!-- Error Toast -->
+  <div class="error-container" id="errorContainer" role="alert" aria-live="polite"></div>
+
+  <!-- Header -->
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <img src="assets/logo.svg" alt="EcoTrip" class="logo" width="180" height="40">
+      <span class="slogan">Viaje de forma mais sustentável</span>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" role="complementary" aria-label="Filtros de cálculo">
+      <!-- Origin / Destination -->
+      <div class="sidebar-section">
+        <label for="origin">Origem</label>
+        <div class="input-group">
+          <input type="text" id="origin" class="input-field" placeholder="Cidade, estado ou endereço" autocomplete="off" aria-required="true">
+        </div>
+
+        <button type="button" id="swapBtn" class="swap-btn" aria-label="Inverter origem e destino" title="Inverter">
+          &#x21C4;
+        </button>
+
+        <label for="destination">Destino</label>
+        <div class="input-group">
+          <input type="text" id="destination" class="input-field" placeholder="Cidade, estado ou endereço" autocomplete="off" aria-required="true">
+        </div>
+      </div>
+
+      <!-- Transport Mode -->
+      <div class="sidebar-section">
+        <label>Modo de Transporte</label>
+        <div class="mode-selector" role="radiogroup" aria-label="Selecione o modo de transporte">
+          <button type="button" class="mode-btn" data-mode="walking" role="radio" aria-checked="false" aria-label="A pé">
+            <span class="mode-icon" aria-hidden="true">&#x1F6B6;</span>
+            <span class="mode-label">A pé</span>
+          </button>
+          <button type="button" class="mode-btn" data-mode="bicycle" role="radio" aria-checked="false" aria-label="Bicicleta">
+            <span class="mode-icon" aria-hidden="true">&#x1F6B2;</span>
+            <span class="mode-label">Bicicleta</span>
+          </button>
+          <button type="button" class="mode-btn" data-mode="motorcycle" role="radio" aria-checked="false" aria-label="Moto">
+            <span class="mode-icon" aria-hidden="true">&#x1F3CD;</span>
+            <span class="mode-label">Moto</span>
+          </button>
+          <button type="button" class="mode-btn" data-mode="car" role="radio" aria-checked="true" aria-label="Carro">
+            <span class="mode-icon" aria-hidden="true">&#x1F697;</span>
+            <span class="mode-label">Carro</span>
+          </button>
+          <button type="button" class="mode-btn" data-mode="bus" role="radio" aria-checked="false" aria-label="Ônibus">
+            <span class="mode-icon" aria-hidden="true">&#x1F68C;</span>
+            <span class="mode-label">Ônibus</span>
+          </button>
+          <button type="button" class="mode-btn" data-mode="truck" role="radio" aria-checked="false" aria-label="Caminhão">
+            <span class="mode-icon" aria-hidden="true">&#x1F69B;</span>
+            <span class="mode-label">Caminhão</span>
+          </button>
+          <button type="button" class="mode-btn" data-mode="airplane" role="radio" aria-checked="false" aria-label="Avião">
+            <span class="mode-icon" aria-hidden="true">&#x2708;</span>
+            <span class="mode-label">Avião</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Calculate Button -->
+      <button type="button" id="calculateBtn" class="btn-primary">
+        Calcular Impacto
+      </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" role="main">
+
+      <!-- Recommendation Banner -->
+      <div class="recommendation-banner" id="recommendationBanner" role="alert" aria-live="polite"></div>
+
+      <!-- Map -->
+      <section class="map-container" aria-label="Mapa interativo">
+        <div id="mapView"></div>
+      </section>
+
+      <!-- Results Section -->
+      <section class="results-section" id="resultsSection" aria-label="Resultados">
+        <h2 class="section-title">Resultados</h2>
+        <div class="results-grid">
+          <article class="result-card">
+            <div class="result-card-icon" aria-hidden="true">&#x1F4CD;</div>
+            <div class="result-card-label">Distância</div>
+            <div class="result-card-value" id="resultDistance">—</div>
+          </article>
+          <article class="result-card">
+            <div class="result-card-icon" aria-hidden="true">&#x2601;</div>
+            <div class="result-card-label">Emissão de CO&#x2082;e</div>
+            <div class="result-card-value highlight" id="resultCO2">—</div>
+          </article>
+          <article class="result-card">
+            <div class="result-card-icon" aria-hidden="true">&#x1F4B0;</div>
+            <div class="result-card-label">Créditos de Carbono</div>
+            <div class="result-card-value" id="resultCredits">—</div>
+          </article>
+          <article class="result-card">
+            <div class="result-card-icon" aria-hidden="true">&#x1F333;</div>
+            <div class="result-card-label">Árvores necessárias</div>
+            <div class="result-card-value" id="resultTrees">—</div>
+          </article>
+          <article class="result-card">
+            <div class="result-card-icon" aria-hidden="true">&#x1F4B5;</div>
+            <div class="result-card-label">Custo estimado</div>
+            <div class="result-card-value" id="resultCost">—</div>
+          </article>
+        </div>
+        <div class="export-wrapper">
+          <button type="button" id="exportBtn" class="btn-secondary">
+            &#x1F4C4; Exportar PDF
+          </button>
+        </div>
+      </section>
+
+      <!-- Comparison Section -->
+      <section class="comparison-section" id="comparisonSection" aria-label="Comparação entre modais">
+        <h2 class="section-title">Comparação entre Modais</h2>
+        <div class="comparison-table-wrapper">
+          <table id="comparisonTable">
+            <thead>
+              <tr>
+                <th scope="col">Transporte</th>
+                <th scope="col">Tempo estimado</th>
+                <th scope="col">CO&#x2082;e por pessoa</th>
+                <th scope="col">Eficiência</th>
+              </tr>
+            </thead>
+            <tbody id="comparisonBody">
+              <tr>
+                <td colspan="4" style="text-align:center;color:var(--gray-400);padding:24px;">
+                  Calcule um trajeto para ver a comparação.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Compensation Card -->
+      <section class="compensation-card" aria-label="Compensação de carbono">
+        <h3>Compensar agora?</h3>
+        <p>Neutralize sua viagem apoiando projetos de reflorestamento.</p>
+        <button type="button" class="btn-primary">Apoiar Projeto</button>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer" role="contentinfo">
+        <span>EcoTrip &copy; 2026</span>
+        <span>Desenvolvido com HTML, CSS, JavaScript, Leaflet e OpenStreetMap</span>
+        <a href="https://github.com/anomalyco/ecotrip" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/emissions.js"></script>
+  <script src="js/comparison.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
