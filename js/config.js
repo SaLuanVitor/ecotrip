@@ -47,5 +47,15 @@ window.EcoTrip.config = {
   creditFactor: 1000,
   treesFactor: 21,
   costPerCredit: 50,
-  airplaneExtraTime: 60
+  airplaneExtraTime: 60,
+
+  modeHelpTexts: {
+    walking: 'Rota otimizada para pedestres.',
+    bicycle: 'Rota otimizada para ciclistas.',
+    motorcycle: 'Usa a malha vi\u00E1ria padr\u00E3o com emiss\u00F5es de motocicleta.',
+    car: 'Rota rodovi\u00E1ria padr\u00E3o.',
+    bus: 'Usa dist\u00E2ncia rodovi\u00E1ria para estimativa ambiental.',
+    truck: 'Usa dist\u00E2ncia rodovi\u00E1ria para transporte de carga.',
+    airplane: 'Calcula dist\u00E2ncia em linha reta entre origem e destino.'
+  }
 };

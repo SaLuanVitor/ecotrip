@@ -7,6 +7,8 @@
   var routePolyline = null;
   var geocodeCache = {};
 
+  var dblClickHandler = null;
+
   var osrmProfiles = {
     walking: 'foot',
     bicycle: 'cycling',
@@ -85,6 +87,30 @@
       });
     },
 
+    reverseGeocode: function (lat, lng) {
+      var config = window.EcoTrip.config;
+      var url =
+        'https://nominatim.openstreetmap.org/reverse' +
+        '?format=jsonv2' +
+        '&lat=' + lat +
+        '&lon=' + lng +
+        '&addressdetails=1' +
+        '&email=' + encodeURIComponent(config.CONTACT_EMAIL);
+
+      return window.EcoTrip.utils.retryFetch(url, {
+        headers: {
+          Accept: 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      }, 2, config.REQUEST_TIMEOUT_MS)
+        .then(function (data) {
+          if (data && data.display_name) {
+            return { lat: lat, lng: lng, address: data.display_name };
+          }
+          return { lat: lat, lng: lng, address: lat.toFixed(4) + ', ' + lng.toFixed(4) };
+        });
+    },
+
     calculateRoute: function (origin, dest, mode) {
       var utils = window.EcoTrip.utils;
       var config = window.EcoTrip.config;
@@ -156,6 +182,21 @@
       routeLayer.addLayer(routePolyline);
     },
 
+    drawDashedLine: function (origin, dest) {
+      if (!routeLayer) return;
+      routeLayer.clearLayers();
+      var coords = [[origin.lat, origin.lng], [dest.lat, dest.lng]];
+      routePolyline = L.polyline(coords, {
+        color: '#16A34A',
+        weight: 3,
+        opacity: 0.8,
+        dashArray: '10, 10',
+        lineCap: 'round',
+        lineJoin: 'round'
+      });
+      routeLayer.addLayer(routePolyline);
+    },
+
     addMarkers: function (origin, dest) {
       if (!markerLayer) return;
       markerLayer.clearLayers();
@@ -199,6 +240,25 @@
     invalidateSize: function () {
       if (mapInstance) {
         mapInstance.invalidateSize();
+      }
+    },
+
+    onMapDblClick: function (callback) {
+      if (mapInstance) {
+        if (dblClickHandler) {
+          mapInstance.off('dblclick', dblClickHandler);
+        }
+        dblClickHandler = function (e) {
+          callback({ lat: e.latlng.lat, lng: e.latlng.lng });
+        };
+        mapInstance.on('dblclick', dblClickHandler);
+      }
+    },
+
+    removeDblClick: function () {
+      if (mapInstance && dblClickHandler) {
+        mapInstance.off('dblclick', dblClickHandler);
+        dblClickHandler = null;
       }
     },
 

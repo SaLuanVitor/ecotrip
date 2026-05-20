@@ -8,13 +8,18 @@ EcoTrip calculates the carbon footprint of a trip between two locations and sugg
 
 - Carbon footprint calculation for 7 transportation modes
 - Interactive map with route visualization (Leaflet + OpenStreetMap)
+- Double-click point selection on the map
+- Clear points button to reset selections
+- Mode-specific routing (walking, cycling, driving routes on map)
 - Geocoding via Nominatim
 - Routing via OSRM public API
-- Emissions comparison across all modes
+- Emissions comparison across all modes with per-mode distance handling
 - Carbon credits and offset cost estimation
 - Trees required calculation
 - Recommendation engine for sustainable choices
-- PDF export
+- PDF export via html2pdf.js
+- Result card tooltips with contextual information
+- Transport mode help text with contextual descriptions
 - Responsive design (desktop, tablet, mobile)
 
 ## Transportation Modes
@@ -38,7 +43,7 @@ EcoTrip calculates the carbon footprint of a trip between two locations and sugg
 - [OpenStreetMap](https://www.openstreetmap.org/) — map tiles
 - [Nominatim](https://nominatim.org/) — geocoding
 - [OSRM](https://project-osrm.org/) — route calculation
-- [html2canvas](https://html2canvas.hertzen.com/) + [jsPDF](https://parall.ax/products/jspdf) — PDF export
+- [html2pdf.js](https://ekoopmans.github.io/html2pdf.js/) — PDF export
 
 ## Setup
 

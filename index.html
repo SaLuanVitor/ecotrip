@@ -31,6 +31,7 @@
 
   <!-- Error Toast -->
   <div class="error-container" id="errorContainer" role="alert" aria-live="polite"></div>
+  <div class="status-message" id="statusMessage" role="status" aria-live="polite"></div>
 
   <!-- Header -->
   <header class="header" role="banner">
@@ -54,6 +55,10 @@
 
         <button type="button" id="swapBtn" class="swap-btn" aria-label="Inverter origem e destino" title="Inverter">
           &#x21C4;
+        </button>
+
+        <button type="button" id="clearPointsBtn" class="btn-secondary btn-clear" aria-label="Limpar pontos selecionados no mapa">
+          Limpar Pontos
         </button>
 
         <label for="destination">Destino</label>
@@ -95,6 +100,7 @@
             <span class="mode-label">Avião</span>
           </button>
         </div>
+        <p id="modeHelpText" class="mode-help-text" aria-live="polite">Selecione um modo de transporte.</p>
       </div>
 
       <!-- Calculate Button -->
@@ -106,6 +112,7 @@
     <!-- Main Content -->
     <main class="main-content" role="main">
 
+      <div id="results-dashboard">
       <!-- Recommendation Banner -->
       <div class="recommendation-banner" id="recommendationBanner" role="alert" aria-live="polite"></div>
 
@@ -120,27 +127,57 @@
         <div class="results-grid">
           <article class="result-card">
             <div class="result-card-icon" aria-hidden="true">&#x1F4CD;</div>
-            <div class="result-card-label">Distância</div>
+            <div class="result-card-header">
+              <span class="result-card-label">Distância</span>
+              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0">
+                &#x24D8;
+                <span class="tooltip-text">Distância total estimada entre origem e destino.</span>
+              </button>
+            </div>
             <div class="result-card-value" id="resultDistance">—</div>
           </article>
           <article class="result-card">
             <div class="result-card-icon" aria-hidden="true">&#x2601;</div>
-            <div class="result-card-label">Emissão de CO&#x2082;e</div>
+            <div class="result-card-header">
+              <span class="result-card-label">Emissão de CO&#x2082;e</span>
+              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0">
+                &#x24D8;
+                <span class="tooltip-text">Quantidade estimada de dióxido de carbono equivalente emitida na viagem.</span>
+              </button>
+            </div>
             <div class="result-card-value highlight" id="resultCO2">—</div>
           </article>
           <article class="result-card">
             <div class="result-card-icon" aria-hidden="true">&#x1F4B0;</div>
-            <div class="result-card-label">Créditos de Carbono</div>
+            <div class="result-card-header">
+              <span class="result-card-label">Créditos de Carbono</span>
+              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0">
+                &#x24D8;
+                <span class="tooltip-text">Quantidade aproximada de créditos necessários para compensar a emissão. 1 crédito corresponde a 1 tonelada de CO&#x2082;e.</span>
+              </button>
+            </div>
             <div class="result-card-value" id="resultCredits">—</div>
           </article>
           <article class="result-card">
             <div class="result-card-icon" aria-hidden="true">&#x1F333;</div>
-            <div class="result-card-label">Árvores necessárias</div>
+            <div class="result-card-header">
+              <span class="result-card-label">Árvores necessárias</span>
+              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0">
+                &#x24D8;
+                <span class="tooltip-text">Quantidade estimada de árvores necessárias para absorver o CO&#x2082; emitido em aproximadamente um ano.</span>
+              </button>
+            </div>
             <div class="result-card-value" id="resultTrees">—</div>
           </article>
           <article class="result-card">
             <div class="result-card-icon" aria-hidden="true">&#x1F4B5;</div>
-            <div class="result-card-label">Custo estimado</div>
+            <div class="result-card-header">
+              <span class="result-card-label">Custo estimado</span>
+              <button class="info-btn" type="button" aria-label="Mais informações" tabindex="0">
+                &#x24D8;
+                <span class="tooltip-text">Valor aproximado para compensar a emissão por meio de projetos ambientais.</span>
+              </button>
+            </div>
             <div class="result-card-value" id="resultCost">—</div>
           </article>
         </div>
@@ -188,6 +225,7 @@
         <span>Desenvolvido com HTML, CSS, JavaScript, Leaflet e OpenStreetMap</span>
         <a href="https://github.com/anomalyco/ecotrip" target="_blank" rel="noopener noreferrer">GitHub</a>
       </footer>
+      </div>
 
     </main>
   </div>

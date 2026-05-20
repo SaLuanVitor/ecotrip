@@ -25,14 +25,23 @@ window.EcoTrip.comparison = {
     return window.EcoTrip.utils.formatDuration(minutes);
   },
 
-  generateComparison: function(distanceKm, geodesicDistanceKm) {
+  generateComparison: function(distances) {
     var modes = window.EcoTrip.config.transportModes;
     var data = [];
 
     for (var i = 0; i < modes.length; i++) {
       var mode = modes[i];
-      var d = (mode.id === 'airplane' && geodesicDistanceKm != null)
-                ? geodesicDistanceKm : distanceKm;
+      var d;
+      if (mode.id === 'walking') {
+        d = distances.walking || distances.road;
+      } else if (mode.id === 'bicycle') {
+        d = distances.cycling || distances.road;
+      } else if (mode.id === 'airplane') {
+        d = distances.geodesic;
+      } else {
+        d = distances.road;
+      }
+
       var co2 = window.EcoTrip.emissions.calculateEmissions(d, mode.id);
       var time = this.calculateEstimatedTime(d, mode.id);
       var efficiency = this.getEfficiencyLabel(co2);
